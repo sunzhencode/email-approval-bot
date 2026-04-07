@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 RESULT_PASSED = "Passed"
 RESULT_FAILED = "Failed"
 RESULT_CANCELLED = "Cancelled"
-RESULT_UNKNOWN = "Unknown"  # still running or not started yet
+RESULT_RUNNING = "Running"  # stage is actively executing
+RESULT_UNKNOWN = "Unknown"  # not started yet or indeterminate
 
 
 def trigger_stage(pipeline_name: str, pipeline_counter: str, execute_stage: str,
@@ -73,7 +74,11 @@ def get_stage_result(pipeline_name: str, pipeline_counter: str, execute_stage: s
 
     data = response.json()
     result = data.get("result", RESULT_UNKNOWN)
+    status = data.get("status", "")
     logger.debug("GoCD %s/%s/%s → result=%s status=%s",
-                 pipeline_name, pipeline_counter, execute_stage,
-                 result, data.get("status", ""))
+                 pipeline_name, pipeline_counter, execute_stage, result, status)
+    # GoCD sets result="Unknown" while the stage is still building;
+    # use the status field to distinguish "running" from "not started".
+    if result == RESULT_UNKNOWN and status in ("Building", "Scheduled", "Preparing"):
+        return RESULT_RUNNING
     return result

@@ -176,6 +176,11 @@ def poll_once(imap: ImapClient, store: StateStore, config) -> None:
             feishu_notifier.notify_executed(config.feishu_webhook_url, req)
             _maybe_send_done_reply(config, store, imap, req)
             continue
+        if pre_result == gocd_client.RESULT_RUNNING:
+            store.mark_triggered(req.id)
+            logger.info("[AlreadyRunning] %s/%s  issue=%s — stage already running, marking triggered",
+                        req.pipeline_name, req.pipeline_counter, req.issue_number or "-")
+            continue
         if pre_result in (gocd_client.RESULT_FAILED, gocd_client.RESULT_CANCELLED):
             store.mark_failed(req.id, f"GoCD stage already {pre_result} before trigger")
             logger.warning("[AlreadyFailed] %s/%s  issue=%s — stage already %s, skipping trigger",
