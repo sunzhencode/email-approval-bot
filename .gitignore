@@ -1,0 +1,29 @@
+# IDE
+.idea/
+.vscode/
+
+# Virtual environment
+.venv/
+
+# Agent customization
+.claude/
+
+# Database
+*.db
+*.sqlite
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Logs
+logs/*.log
+
+# OS
+.DS_Store

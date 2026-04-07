@@ -1,0 +1,24 @@
+{
+  "id": "email-approval-bot",
+  "name": "邮件审批机器人",
+  "description": "监听飞书邮箱，检测审批邮件，自动触发 GoCD pipeline",
+  "icon": "📧",
+  "version": "1.0.0",
+  "service": {
+    "command": ".venv/bin/python",
+    "args": ["main.py"],
+    "auto_start": false,
+    "env_keys": ["IMAP_HOST", "IMAP_USER", "IMAP_PASSWORD", "GOCD_BASE_URL", "GOCD_TOKEN", "FEISHU_WEBHOOK_URL"]
+  },
+  "mcp": {
+    "command": ".venv/bin/python",
+    "args": ["mcp_server.py"],
+    "tools": [
+      "list_pending_requests",
+      "get_request_status",
+      "list_recent_executions",
+      "retry_failed_request",
+      "get_bot_statistics"
+    ]
+  }
+}
