@@ -9,14 +9,17 @@ from .state_store import RequestData, make_request_id
 
 logger = logging.getLogger(__name__)
 
-# Matches: https://ci.otr.mercedes-benz.com.cn/go/pipelines/{name}/{counter}/{stage}/{run}
+# Matches: https://<your-gocd-host>/go/pipelines/{name}/{counter}/{stage}/{run}
+# Set GOCD_BASE_URL in .env; the regex is built from that value at startup
+import os as _os
+_gocd_base = _os.getenv("GOCD_BASE_URL", "https://gocd.example.com").rstrip("/")
+_escaped = re.escape(_gocd_base)
 PIPELINE_URL_RE = re.compile(
-    r"^https://ci\.otr\.mercedes-benz\.com\.cn/go/pipelines/([\w-]+)/(\d+)/([\w-]+)/(\d+)$"
+    rf"^{_escaped}/go/pipelines/([\w-]+)/(\d+)/([\w-]+)/(\d+)$"
 )
-
 # Non-anchored variant for scanning free-form plain text
 PIPELINE_URL_RE_INLINE = re.compile(
-    r"https://ci\.otr\.mercedes-benz\.com\.cn/go/pipelines/([\w-]+)/(\d+)/([\w-]+)/(\d+)"
+    rf"{_escaped}/go/pipelines/([\w-]+)/(\d+)/([\w-]+)/(\d+)"
 )
 
 # Keywords indicating deferred/scheduled execution — bot should NOT auto-trigger.
@@ -69,7 +72,7 @@ def _is_ci_request_table(col_map: dict[str, int]) -> bool:
     return has_issue and has_pipeline
 
 
-def parse_request_emails(raw: RawEmail) -> list[RequestData]:
+def parse_request_emails(raw: RawEmail, target_email: str = "") -> list[RequestData]:
     """
     Parse all CI pipeline requests from a single email.
     Returns one RequestData per valid table row (email may contain multiple CI links).
@@ -77,7 +80,7 @@ def parse_request_emails(raw: RawEmail) -> list[RequestData]:
     """
     # Must be addressed to (or CC'd) the group
     combined_recipients = (raw.to_addrs + " " + raw.cc_addrs).lower()
-    if "otr-devops@inspiregroup.com" not in combined_recipients:
+    if target_email and target_email.lower() not in combined_recipients:
         return []
 
     if not raw.html_body:

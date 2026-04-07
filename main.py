@@ -108,7 +108,7 @@ def poll_once(imap: ImapClient, store: StateStore, config) -> None:
                 continue
 
             # 3. CI request (table + inline, merged)
-            requests = parse_request_emails(raw)
+            requests = parse_request_emails(raw, config.target_email)
             inline_requests = parse_inline_request(raw, config)
             existing_counters = {(r.pipeline_name, r.pipeline_counter) for r in requests}
             for r in inline_requests:

@@ -59,7 +59,7 @@ def load_config() -> Config:
         imap_port=int(os.getenv("IMAP_PORT", "993")),
         imap_user=require("IMAP_USER"),
         imap_password=require("IMAP_PASSWORD"),
-        target_email=os.getenv("TARGET_EMAIL", "otr-devops@inspiregroup.com"),
+        target_email=os.getenv("TARGET_EMAIL", ""),
         poll_interval=int(os.getenv("POLL_INTERVAL_SECONDS", "60")),
         approved_senders=csv_list("APPROVED_SENDERS", ""),
         approval_keywords=csv_list("APPROVAL_KEYWORDS", "approve,approved,ok,同意,lgtm,好的,yes,+1"),

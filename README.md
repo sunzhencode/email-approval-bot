@@ -28,11 +28,9 @@ IMAP inbox ──► email_parser ──► state_store (SQLite)
 
 ## Setup
 
-### 1. Clone and install
+### 1. Install
 
 ```bash
-git clone git@github.com:sunzhencode/email-approval-bot.git
-cd email-approval-bot
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
